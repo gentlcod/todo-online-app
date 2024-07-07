@@ -1,4 +1,5 @@
 import React from 'react';
+import Footer from '../components/Footer';
 
 
 const style = {
@@ -46,6 +47,8 @@ const PrivacyPolicy = () => {
          
         </div>
       </div>
+
+      <Footer/>
 
     </div>
   );

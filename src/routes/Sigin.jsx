@@ -4,6 +4,8 @@ import { UserAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { AiFillLock, AiOutlineMail } from 'react-icons/ai';
 import { IoEye, IoEyeOff } from "react-icons/io5";
+import Footer from '../components/Footer';
+
 
 const styles = {
   bg: 'h-screen w-screen p-4 bg-gradient-to-r from-[#2F80ED] to-[#1CB5E0]',
@@ -117,6 +119,7 @@ const SignIn = () => {
           </div>
         </div>
       </div>
+      <Footer/>
     </div>
   );
 };
