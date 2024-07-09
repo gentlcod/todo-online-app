@@ -1,89 +1,117 @@
-import React, { useState, useEffect } from "react";
-import { useLocation } from 'react-router-dom';
-import { AiOutlinePlus } from "react-icons/ai";
-import ToDo from "../components/ToDo";
-import { db } from "../firebase";
-import Footer from "../components/Footer";
-import { query, collection, onSnapshot, updateDoc, doc, addDoc, deleteDoc } from "firebase/firestore";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AiOutlinePlus } from 'react-icons/ai';
+import ToDo from '../components/ToDo';
+import { db, auth } from '../firebase';
+import { query, collection, onSnapshot, updateDoc, doc, addDoc, deleteDoc } from 'firebase/firestore';
 
 const style = {
-    bg: `lg:h-[782px] h-100vh w-screen p-4 bg-gradient-to-r from-[#2F80ED] to-[#1CB5E0]`,
-    container: `max-w-[500px] w-full mx-auto bg-white rounded-md shadow-md p-4`,
-    heading: `text-3xl font-bold text-center text-gray-800 mb-4 p-2`,
-    form: `flex justify-between items-center`,
-    input: `border border-gray-300 rounded-md p-2 w-full mr-2`,
-    button: `border bg-purple-500 text-white p-1 rounded-md hover:bg-blue-600`,
-    count: `text-center my-2`
+    bg: 'min-h-screen w-screen p-4 bg-gradient-to-r from-[#2F80ED] to-[#1CB5E0]', // Adjusted height to min-h-screen
+    container: 'max-w-[500px] w-full mx-auto bg-white rounded-md shadow-md p-4',
+    heading: 'text-3xl font-bold text-center text-gray-800 mb-4 p-2',
+    form: 'flex justify-between items-center',
+    input: 'border border-gray-300 rounded-md p-2 w-full mr-2',
+    button: 'border bg-blue-500 text-white p-1 rounded-md hover:bg-[#1CB5E0]',
+    count: 'text-center my-2',
 };
 
 const Home = () => {
-    const location = useLocation();
-    const { name, email } = location.state || {};
-    const [todos, setTodos] = useState(['Learn React', 'Grind Leetcode']);
+    const [todos, setTodos] = useState([]);
     const [input, setInput] = useState('');
-  
-    const createTodo = async (e) => {
-      e.preventDefault();
-      if(input === '') {
-        alert('Please enter a todo');
-        return;
-      }
-      await addDoc(collection(db, 'todos'), {
-        text: input,
-        completed: false
-      });
-      setInput('');
-    };
-  
+    const [user, setUser] = useState(null);
+    const navigate = useNavigate();
+
     useEffect(() => {
-      const q = query(collection(db, 'todos'));
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        let todosArr = [];
-        querySnapshot.forEach((doc) => {
-          todosArr.push({...doc.data(), id: doc.id });
+        const unsubscribe = auth.onAuthStateChanged(user => {
+            setUser(user);
+            if (!user) {
+                navigate('/');
+            }
         });
-        setTodos(todosArr);
-      });
-  
-      return () => unsubscribe();
-    }, []);
-  
-    const toggleComplete = async (todo) => {
-      await updateDoc(doc(db, 'todos', todo.id), {
-        completed: !todo.completed
-      });
+
+        return () => unsubscribe();
+    }, [navigate]);
+
+    useEffect(() => {
+        if (user) {
+            const q = query(collection(db, 'users', user.uid, 'todos'));
+            const unsubscribe = onSnapshot(q, (querySnapshot) => {
+                const todosArr = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+                setTodos(todosArr);
+            });
+
+            return () => unsubscribe();
+        }
+    }, [user]);
+
+    const createTodo = async (e) => {
+        e.preventDefault();
+        if (input === '') {
+            alert('Please enter a todo');
+            return;
+        }
+        if (user) {
+            await addDoc(collection(db, 'users', user.uid, 'todos'), {
+                text: input,
+                completed: false
+            });
+            setInput('');
+        }
     };
-  
+
+    const toggleComplete = async (todo) => {
+        if (user) {
+            await updateDoc(doc(db, 'users', user.uid, 'todos', todo.id), {
+                completed: !todo.completed
+            });
+        }
+    };
+
     const deleteTodo = async (id) => {
-      await deleteDoc(doc(db, 'todos', id));
+        if (user) {
+            await deleteDoc(doc(db, 'users', user.uid, 'todos', id));
+        }
+    };
+
+    const handleSignOut = async () => {
+        await auth.signOut();
+        navigate('/');
     };
 
     return (
-      <div className={style.bg}>
-        <div className={style.container}>
-          {name && email && (
-            <div className="mb-4">
-              <h2 className="text-2xl font-semibold text-center text-gray-800">Welcome, {name}!</h2>
-              <p className="text-center text-gray-600">{email}</p>
+        <div className={style.bg}>
+            <div className={style.container}>
+                <h3 className={style.heading}>TODO</h3>
+                <form onSubmit={createTodo} className={style.form}>
+                    <input
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        className={style.input}
+                        type="text"
+                        placeholder="Add a todo"
+                    />
+                    <button className={style.button} type='submit'>
+                        <AiOutlinePlus size={30} />
+                    </button>
+                </form>
+                <ul>
+                    {todos.map((todo, index) => (
+                        <ToDo key={index} todo={todo} toggleComplete={toggleComplete} deleteTodo={deleteTodo} />
+                    ))}
+                </ul>
+                {todos.length > 0 && <p className={style.count}>{`You have ${todos.length} todos`}</p>}
+                <br />
+                {user && (
+                    <>
+                        <p className="text-center text-gray-700 mt-4">{user.email}</p>
+                        <button onClick={handleSignOut} className="block mx-auto mt-4 bg-red-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-red-600">
+                            Sign Out
+                        </button>
+                    </>
+                )}
             </div>
-          )}
-          <h3 className={style.heading}>TODO</h3>
-          <form onSubmit={createTodo} className={style.form}>
-            <input value={input} onChange={(e) => setInput(e.target.value)} className={style.input} type="text" placeholder="Add a todo" />
-            <button className={style.button} type='submit'>
-              <AiOutlinePlus size={30} />
-            </button>
-          </form>
-          <ul>
-            {todos.map((todo, index) => (
-              <ToDo key={index} todo={todo} toggleComplete={toggleComplete} deleteTodo={deleteTodo} />
-            ))}
-          </ul>
-          {todos.length < 1 ? null : <p className={style.count}>{`You have ${todos.length} todos`}</p>}
         </div>
-        <Footer />
-      </div>
     );
-}
+};
 
 export default Home;

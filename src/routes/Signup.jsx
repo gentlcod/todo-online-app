@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { UserAuth } from '../context/AuthContext';
-import { FaRegUser } from "react-icons/fa";
 import { Link, useNavigate } from 'react-router-dom';
 import { AiFillLock, AiOutlineMail } from 'react-icons/ai';
 import { IoEye, IoEyeOff } from "react-icons/io5";
@@ -46,7 +45,7 @@ const styles = {
 const SignUp = () => {
   const { signUpWithEmail } = UserAuth();
   const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
+  const [name] = useState('');
   const [password, setPassword] = useState('');
   const [repeatPassword, setRepeatPassword] = useState('');
   const [error, setError] = useState('');
@@ -61,10 +60,10 @@ const SignUp = () => {
       return;
     }
     try {
-      await signUpWithEmail(email, password);
-      navigate('/home'); // Redirect to '/home' after successful sign-up
+      await signUpWithEmail(email, password, name);
+      navigate('/home');
     } catch (error) {
-      setError(error.message); // Display error message
+      setError(error.message);
       console.error(error.message);
     }
   };
@@ -74,27 +73,16 @@ const SignUp = () => {
       <div className={styles.container}>
         <div style={styles.formContainer}>
           <img
-            src='/icon.png'  // Ensure this path is correct relative to your public folder
+            src='/icon.png'
             alt='logo'
             width={75}
             height={75}
-            className={styles.logo} // Apply the logo style class
           />
           <br />
           <h2 className='text-2xl font-bold mb-4'>Create Account</h2>
           {error && <p className='bg-red-300 my-2 p-3'>{error}</p>}
           <form onSubmit={handleSignUpWithEmail} className='w-[350px]'>
-            <div className='my-4'>
-              <label>Full Name</label>
-              <div className='my-2 w-full relative rounded-2xl shadow-xl'>
-                <input
-                  onChange={(e) => setName(e.target.value)}
-                  className='w-full p-2 bg-primary border border-input rounded-2xl'
-                  type="text"
-                />
-                <FaRegUser className='absolute right-2 top-3 text-gray-400' />
-              </div>
-            </div>
+          
             <div className='my-4'>
               <label>Email</label>
               <div className='my-2 w-full relative rounded-2xl shadow-xl'>
@@ -107,7 +95,7 @@ const SignUp = () => {
               </div>
             </div>
             <div className='my-4'>
-              <label>Password</label>
+              <label>Create Password</label>
               <div className='my-2 w-full relative rounded-2xl shadow-xl'>
                 <input
                   onChange={(e) => setPassword(e.target.value)}
@@ -151,7 +139,7 @@ const SignUp = () => {
           <div style={styles.signInLink}>
             Already have an account? 
             <Link to="/sign-in">
-              <p className='hover:text-[#1CB5E0] duration-300 ease-in-out underline'>Log In</p>
+              <p className='hover:text-[#1CB5E0] duration-300 ease-in-out underline'>Sign In</p>
             </Link>
           </div>
         </div>

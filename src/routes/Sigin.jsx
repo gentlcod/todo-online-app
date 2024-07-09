@@ -1,11 +1,9 @@
-// SignIn.js
 import React, { useState } from 'react';
 import { UserAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { AiFillLock, AiOutlineMail } from 'react-icons/ai';
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import Footer from '../components/Footer';
-
 
 const styles = {
   bg: 'h-screen w-screen p-4 bg-gradient-to-r from-[#2F80ED] to-[#1CB5E0]',
@@ -45,7 +43,7 @@ const styles = {
 };
 
 const SignIn = () => {
-  const { signInWithEmail } = UserAuth(); // Access the sign-in function from the context
+  const { signInWithEmail } = UserAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -55,11 +53,10 @@ const SignIn = () => {
   const handleSignInWithEmail = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmail(email, password);
-      navigate('/home'); // Navigate to the home page after successful sign-in
+      const userCredential = await signInWithEmail(email, password);
+      navigate('/home');
     } catch (e) {
-      setError(e.message); // Set error state to display error message
-      console.error(e.message);
+      setError(e.message);
     }
   };
 
@@ -68,7 +65,7 @@ const SignIn = () => {
       <div className={styles.container}>
         <div style={styles.formContainer}>
           <img
-            src='/icon.png'  // Ensure this path is correct relative to your public folder
+            src='/icon.png'
             alt='logo'
             width={75}
             height={75}

@@ -1,18 +1,30 @@
 import React from 'react';
 import Footer from '../components/Footer';
 
-
 const style = {
-  bg: `h-screen w-screen p-4 bg-gradient-to-r from-[#2F80ED] to-[#1CB5E0]`,
+  bg: `lg:h-screen h-100vh w-screen p-4 bg-gradient-to-r from-[#2F80ED] to-[#1CB5E0]`,
   container: `max-w-[1430px] w-full mx-auto bg-white rounded-md shadow-md p-4`,
   heading: `text-3xl font-bold text-center text-gray-800 mb-4 p-2`,
-  content: `text-gray-700 text-sm p-2`
+  content: `text-gray-700 text-sm p-2`,
+  logoContainer: `flex justify-center items-center mb-4`, // Centering styles for the logo
+  logo: `mb-2`, // Additional margin bottom for spacing
 };
 
 const PrivacyPolicy = () => {
   return (
     <div className={style.bg}>
       <div className={style.container}>
+        <div className={style.logoContainer}>
+        <a href='/'>
+          <img
+            src='/icon.png'  // Ensure this path is correct relative to your public folder
+            alt='logo'
+            width={75}
+            height={75}
+            className={style.logo} // Apply the logo style class
+          />
+          </a>
+        </div>
         <h3 className={style.heading}>Privacy Policy</h3>
         <div className={style.content}>
           <p>
@@ -44,11 +56,13 @@ const PrivacyPolicy = () => {
           <p>
             We may share information we have collected about you in certain situations. Your information may be disclosed as follows:
           </p>
-         
         </div>
       </div>
 
-      <Footer/>
+      <div className='hidden lg:flex'>
+
+        <Footer />
+     </div>
 
     </div>
   );

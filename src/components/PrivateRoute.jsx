@@ -1,11 +1,17 @@
+// PrivateRoute.js
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Route, Navigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
 
-const PrivateRoute = ({ children }) => {
-  const { user } = UserAuth(); // Access the user object from the auth context
+const PrivateRoute = ({ element, ...rest }) => {
+  const { user } = UserAuth();
 
-  return user ? children : <Navigate to="/" />;
+  return (
+    <Route
+      {...rest}
+      element={user ? element : <Navigate to="/" replace />} // Use Navigate with replace to avoid adding to history stack
+    />
+  );
 };
 
 export default PrivateRoute;
