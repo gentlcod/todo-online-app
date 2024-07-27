@@ -6,13 +6,13 @@ const Footer = () => {
       <div className="flex justify-between">
         <div>
           
-          <a href="/privacy-policy" className="text-white hover:shadow-md duration-300 ease-in-out">
+          <a href="/privacy-policy" className="text-white">
             Privacy Policy
           </a>
         </div>
         <p className="text-white font-bold">&copy; 2024 TODO</p>
         <div>
-          <a href="/terms-of-service" className="text-white hover:shadow-md duration-300 ease-in-out">
+          <a href="/terms-of-service" className="text-white">
             Terms Of Service
           </a>
         </div>
